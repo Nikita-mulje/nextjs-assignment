@@ -40,7 +40,7 @@ export function EmployeeTable({ data }: Props) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
 
-//   const departments = Array.from(new Set(data.map((e) => e.department)))
+  //   const departments = Array.from(new Set(data.map((e) => e.department)))
   const departments = Array.from(new Set(data.map((e) => e.department)))
 
   const table = useReactTable({
@@ -115,24 +115,86 @@ export function EmployeeTable({ data }: Props) {
         </Table>
       </div>
 
-      <div className="flex justify-end gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Previous
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Next
-        </Button>
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.setPageIndex(0)}
+            disabled={!table.getCanPreviousPage()}
+          >
+            First
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Next
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+            disabled={!table.getCanNextPage()}
+          >
+            Last
+          </Button>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span>
+            Page{" "}
+            <strong>
+              {table.getState().pagination.pageIndex + 1} of{" "}
+              {table.getPageCount()}
+            </strong>
+          </span>
+          <span>| Go to page:</span>
+          <Input
+            type="number"
+            min={1}
+            max={table.getPageCount()}
+            className="w-16"
+            value={table.getState().pagination.pageIndex + 1}
+            onChange={(e) => {
+              const page = e.target.value ? Number(e.target.value) - 1 : 0
+              table.setPageIndex(page)
+            }}
+          />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span>Rows per page:</span>
+          <Select
+            value={String(table.getState().pagination.pageSize)}
+            onValueChange={(value) => {
+              table.setPageSize(Number(value))
+            }}
+          >
+            <SelectTrigger className="w-[100px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {[5, 10, 20, 50].map((pageSize) => (
+                <SelectItem key={pageSize} value={String(pageSize)}>
+                  {pageSize}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
+
     </div>
   )
 }
