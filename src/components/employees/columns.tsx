@@ -1,3 +1,5 @@
+"use client"
+
 import { ColumnDef } from "@tanstack/react-table"
 import { Employee } from "@/lib/data/employees"
 import { Badge } from "@/components/ui/badge"
@@ -10,6 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import * as React from "react"
 
 export const columns: ColumnDef<Employee>[] = [
   {
@@ -64,21 +67,30 @@ export const columns: ColumnDef<Employee>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const employee = row.original
+      const [open, setOpen] = React.useState(false)
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem>
-              <EditEmployeeDialog employee={employee} />
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setOpen(true)}>
+                Edit
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <EditEmployeeDialog
+            open={open}
+            onOpenChange={setOpen}
+            employee={employee}
+          />
+        </>
       )
     },
   },
