@@ -1,6 +1,6 @@
 'use client'
 
-import { Home, Users, Settings, Menu } from "lucide-react"
+import { Home, Users, Settings, Menu, LogOutIcon } from "lucide-react"
 import {
   Sidebar,
   SidebarProvider,
@@ -13,12 +13,11 @@ import {
   SidebarMenuItem,
   SidebarTrigger
 } from "@/components/ui/sidebar"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "./ThemeToggle"
 import { cn } from "@/lib/utils"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
+import LogOutButton from "./LogOutButton"
 
 const navItems = [
   { title: "Dashboard", href: "/dashboard", icon: Home },
@@ -71,9 +70,19 @@ export default function DashboardLayoutClient({
         {/* Main Content */}
         <div className="flex-1 flex flex-col">
           <header className="flex items-center justify-between px-6 py-4 border-b bg-white dark:bg-zinc-800">
-            <h1 className="text-2xl font-bold"><SidebarTrigger/>Employee Manager</h1>
-            <ThemeToggle />
-          </header>
+  {/* Left side */}
+  <div className="flex items-center space-x-2">
+    <SidebarTrigger />
+    <h1 className="text-2xl font-bold">Employee Manager</h1>
+  </div>
+
+  {/* Right side */}
+  <div className="flex items-center space-x-4">
+    <ThemeToggle />
+    <LogOutButton />
+  </div>
+</header>
+
           <main className="flex-1 p-6">{children}</main>
         </div>
       </SidebarProvider>
