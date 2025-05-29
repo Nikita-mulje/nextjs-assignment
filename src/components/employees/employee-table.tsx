@@ -2,10 +2,11 @@
 
 import * as React from "react"
 import { Employee } from "@/lib/data/employees"
-import { columns } from "./columns"
+import { columns as defaultColumns } from "./columns"
 import {
   ColumnFiltersState,
   SortingState,
+  VisibilityState,
   useReactTable,
   getCoreRowModel,
   getFilteredRowModel,
@@ -15,6 +16,7 @@ import {
 } from "@tanstack/react-table"
 
 import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 import {
   Table,
   TableBody,
@@ -23,7 +25,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
+
 import {
   Select,
   SelectTrigger,
@@ -32,6 +34,13 @@ import {
   SelectItem,
 } from "@/components/ui/select"
 
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuCheckboxItem,
+} from "@/components/ui/dropdown-menu"
+
 type Props = {
   data: Employee[]
 }
@@ -39,19 +48,21 @@ type Props = {
 export function EmployeeTable({ data }: Props) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
 
-  //   const departments = Array.from(new Set(data.map((e) => e.department)))
   const departments = Array.from(new Set(data.map((e) => e.department)))
 
   const table = useReactTable({
     data,
-    columns,
+    columns: defaultColumns,
     state: {
       sorting,
       columnFilters,
+      columnVisibility,
     },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
+    onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -60,32 +71,57 @@ export function EmployeeTable({ data }: Props) {
 
   return (
     <div className="space-y-4">
-      <div className="flex md:flex-row gap-4 justify-between">
+      {/* Filters and column toggle */}
+      <div className="flex flex-col md:flex-row gap-4 justify-between">
         <Input
           placeholder="Search by employee name..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(e) => table.getColumn("name")?.setFilterValue(e.target.value)}
           className="max-w-sm"
         />
-        <Select
-          onValueChange={(value) =>
-            table.getColumn("department")?.setFilterValue(value)
-          }
-        >
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="Filter by department" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="*">All</SelectItem>
-            {departments.map((dept) => (
-              <SelectItem key={dept} value={dept}>
-                {dept}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+
+          <Select
+            onValueChange={(value) =>
+              table.getColumn("department")?.setFilterValue(value === "*" ? "" : value)
+            }
+          >
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Filter by department" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="*">All</SelectItem>
+              {departments.map((dept) => (
+                <SelectItem key={dept} value={dept}>
+                  {dept}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {/* Column visibility dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">Columns</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {table.getAllColumns()
+                .filter((column) => column.getCanHide())
+                .map((column) => (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                  >
+                    {column.id}
+                  </DropdownMenuCheckboxItem>
+                ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
+      {/* Table */}
       <div className="border rounded-md">
         <Table>
           <TableHeader>
@@ -115,6 +151,7 @@ export function EmployeeTable({ data }: Props) {
         </Table>
       </div>
 
+      {/* Pagination */}
       <div className="flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <Button
@@ -155,8 +192,7 @@ export function EmployeeTable({ data }: Props) {
           <span>
             Page{" "}
             <strong>
-              {table.getState().pagination.pageIndex + 1} of{" "}
-              {table.getPageCount()}
+              {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
             </strong>
           </span>
           <span>| Go to page:</span>
@@ -194,7 +230,6 @@ export function EmployeeTable({ data }: Props) {
           </Select>
         </div>
       </div>
-
     </div>
   )
 }
