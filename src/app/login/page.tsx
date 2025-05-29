@@ -67,7 +67,7 @@ export default function LoginPage() {
               />
             </div>
 
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full mt-4">
               Login
             </Button>
           </form>
