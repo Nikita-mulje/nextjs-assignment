@@ -62,9 +62,9 @@ export function EmployeeTable({ data }: Props) {
     <div className="space-y-4">
       <div className="flex md:flex-row gap-4 justify-between">
         <Input
-          placeholder="Search by department..."
-          value={(table.getColumn("department")?.getFilterValue() as string) ?? ""}
-          onChange={(e) => table.getColumn("department")?.setFilterValue(e.target.value)}
+          placeholder="Search by employee name..."
+          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+          onChange={(e) => table.getColumn("name")?.setFilterValue(e.target.value)}
           className="max-w-sm"
         />
         <Select
