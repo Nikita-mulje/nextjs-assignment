@@ -41,11 +41,14 @@ import {
   DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu"
 
+import { CreateEmployeeDialog } from "./CreateEmployeeDialog"
+
 type Props = {
   data: Employee[]
+  onEmployeeCreated?: () => void
 }
 
-export function EmployeeTable({ data }: Props) {
+export function EmployeeTable({ data, onEmployeeCreated }: Props) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
@@ -73,12 +76,15 @@ export function EmployeeTable({ data }: Props) {
     <div className="space-y-4">
       {/* Filters and column toggle */}
       <div className="flex flex-col md:flex-row gap-4 justify-between">
-        <Input
-          placeholder="Search by employee name..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-          onChange={(e) => table.getColumn("name")?.setFilterValue(e.target.value)}
-          className="max-w-sm"
-        />
+        <div className="flex items-center gap-4">
+          <Input
+            placeholder="Search by employee name..."
+            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+            onChange={(e) => table.getColumn("name")?.setFilterValue(e.target.value)}
+            className="max-w-sm"
+          />
+          <CreateEmployeeDialog onEmployeeCreated={onEmployeeCreated} />
+        </div>
         <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
 
           <Select
