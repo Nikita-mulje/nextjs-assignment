@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -41,7 +42,7 @@ export default function LoginPage() {
         <CardHeader>
           <CardTitle className="text-2xl text-center">Login</CardTitle>
         </CardHeader>
-        <CardContent className='m-4'>
+        <CardContent className="m-4">
           <form onSubmit={handleLogin} className="space-y-4">
             {error && <p className="text-sm text-red-500">{error}</p>}
 
@@ -71,6 +72,14 @@ export default function LoginPage() {
               Login
             </Button>
           </form>
+
+          {/* Link to Sign Up */}
+          <p className="text-sm text-center text-muted-foreground mt-6">
+            Don't have an account?{' '}
+            <Link href="/sign-up" className="text-blue-600 hover:underline">
+              Register
+            </Link>
+          </p>
         </CardContent>
       </Card>
     </div>
