@@ -35,9 +35,8 @@ export default function SignUpForm() {
   })
 
   const onSubmit = async (data: SignUpFormValues) => {
-    console.log('SignUp Data:', data)
     try {
-        const response = await fetch('/api/signup', {
+        const response = await fetch('https://employee-management-portal-git-master-sourabhkhot-ns-projects.vercel.app/auth/signup', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
