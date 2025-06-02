@@ -14,20 +14,50 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
-  const handleLogin = (e: React.FormEvent) => {
+  // const handleLogin = (e: React.FormEvent) => {
+  //   e.preventDefault()
+
+  //   // Fake credentials
+  //   const validUsername = 'admin'
+  //   const validPassword = 'password123'
+
+  //   if (username === validUsername && password === validPassword) {
+  //     localStorage.setItem('auth', 'true')
+  //     router.push('/dashboard')
+  //   } else {
+  //     setError('Invalid credentials')
+  //   }
+  // }
+
+  
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-
-    // Fake credentials
-    const validUsername = 'admin'
-    const validPassword = 'password123'
-
-    if (username === validUsername && password === validPassword) {
-      localStorage.setItem('auth', 'true')
-      router.push('/dashboard')
-    } else {
-      setError('Invalid credentials')
+    setError('') // clear any previous errors
+  
+    try {
+      const response = await fetch('https://employee-management-portal-git-master-sourabhkhot-ns-projects.vercel.app/auth/signin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: username, password: password }),
+      })
+      const data = await response.json()
+  
+      if (response.ok) {
+        // Save auth token or set auth flag as needed
+        localStorage.setItem('auth', 'true')
+        localStorage.setItem('token', data.token) // optional if your API sends a token
+        router.push('/dashboard')
+      } else {
+        setError(data.message || 'Login failed')
+      }
+    } catch (error) {
+      setError('Something went wrong. Please try again.')
+      console.error('Login error:', error)
     }
   }
+  
 
   useEffect(() => {
     const isAuth = localStorage.getItem('auth')
