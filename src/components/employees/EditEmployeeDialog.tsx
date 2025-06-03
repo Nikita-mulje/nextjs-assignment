@@ -23,6 +23,7 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Employee } from "@/lib/data/employees"
 import React from "react"
+import { Loader2 } from "lucide-react"
 
 const formSchema = z.object({
   name: z.string().min(2),
@@ -45,6 +46,7 @@ export function EditEmployeeDialog({ employee, open, onOpenChange }: Props) {
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
   })
+  const [isLoading, setIsLoading] = React.useState(false)
 
   React.useEffect(() => {
     const fetchEmployee = async () => {
@@ -80,6 +82,7 @@ export function EditEmployeeDialog({ employee, open, onOpenChange }: Props) {
   }, [open, employee.id, form])
 
   async function onSubmit(data: FormData) {
+    setIsLoading(true)
     try {
       const response = await fetch(`https://employee-management-portal-git-master-sourabhkhot-ns-projects.vercel.app/employees/${employee.id}`, {
         method: 'PATCH',
@@ -104,9 +107,11 @@ export function EditEmployeeDialog({ employee, open, onOpenChange }: Props) {
       const result = await response.json();
       console.log("Employee updated successfully:", result);
       onOpenChange(false); // Close the dialog
+      window.location.reload(); // Refresh to show updated data
     } catch (error) {
       console.error("Error updating employee:", error);
-      // Here you might want to show an error message to the user
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -167,7 +172,16 @@ export function EditEmployeeDialog({ employee, open, onOpenChange }: Props) {
           </div>
 
           <DialogFooter>
-            <Button type="submit">Save</Button>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                'Save'
+              )}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
