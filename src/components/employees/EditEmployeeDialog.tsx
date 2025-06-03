@@ -119,17 +119,17 @@ export function EditEmployeeDialog({ employee, open, onOpenChange }: Props) {
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <Label>Name</Label>
+            <Label className="mb-4">Name</Label>
             <Input {...form.register("name")} />
           </div>
 
           <div>
-            <Label>Email</Label>
+            <Label className="mb-4">Email</Label>
             <Input {...form.register("email")} type="email" />
           </div>
 
           <div>
-            <Label>Department</Label>
+            <Label className="mb-4">Department</Label>
             <Select
               onValueChange={(value) =>
                 form.setValue("department", value)
@@ -149,17 +149,17 @@ export function EditEmployeeDialog({ employee, open, onOpenChange }: Props) {
           </div>
 
           <div>
-            <Label>Designation</Label>
+            <Label className="mb-4">Designation</Label>
             <Input {...form.register("designation")} />
           </div>
 
           <div>
-            <Label>Start Date</Label>
+            <Label className="mb-4">Start Date</Label>
             <Input {...form.register("start_date")} type="date" />
           </div>
 
           <div className="flex items-center gap-2">
-            <Label>Status</Label>
+            <Label className="mb-4">Status</Label>
             <Switch
               checked={form.watch("status")}
               onCheckedChange={(checked) => form.setValue("status", checked)}

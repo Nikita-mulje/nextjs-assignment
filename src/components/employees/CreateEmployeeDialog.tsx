@@ -88,22 +88,22 @@ export function CreateEmployeeDialog({ onEmployeeCreated }: Props) {
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <Label>Employee ID</Label>
+            <Label className="mb-4">Employee ID</Label>
             <Input {...form.register("employee_id")} />
           </div>
 
           <div>
-            <Label>Name</Label>
+            <Label className="mb-4">Name</Label>
             <Input {...form.register("name")} />
           </div>
 
           <div>
-            <Label>Email</Label>
+            <Label className="mb-4">Email</Label>
             <Input {...form.register("email")} type="email" />
           </div>
 
           <div>
-            <Label>Department</Label>
+            <Label className="mb-4">Department</Label>
             <Select
               onValueChange={(value) => form.setValue("department", value)}
             >
@@ -120,17 +120,17 @@ export function CreateEmployeeDialog({ onEmployeeCreated }: Props) {
           </div>
 
           <div>
-            <Label>Designation</Label>
+            <Label className="mb-4">Designation</Label>
             <Input {...form.register("designation")} />
           </div>
 
           <div>
-            <Label>Start Date</Label>
+            <Label className="mb-4">Start Date</Label>
             <Input {...form.register("start_date")} type="date" />
           </div>
 
           <div>
-            <Label>Status</Label>
+            <Label className="mb-4">Status</Label>
             <Select
               onValueChange={(value) => form.setValue("status", value as "active" | "inactive")}
               defaultValue="active"
