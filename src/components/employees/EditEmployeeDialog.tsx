@@ -29,6 +29,7 @@ const formSchema = z.object({
   department: z.string(),
   designation: z.string(),
   status: z.boolean(),
+  start_date: z.string(),
 })
 
 type FormData = z.infer<typeof formSchema>
@@ -44,20 +45,43 @@ export function EditEmployeeDialog({ employee, open, onOpenChange }: Props) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: employee.name,
+      email: employee.email,
       department: employee.department,
       designation: employee.designation,
       status: employee.status === "active",
+      start_date: employee.start_date,
     },
   })
 
-  function onSubmit(data: FormData) {
-    const updatedEmployee = {
-      ...employee,
-      ...data,
-      status: data.status ? "active" : "inactive",
+  async function onSubmit(data: FormData) {
+    try {
+      const response = await fetch(`https://employee-management-portal-git-master-sourabhkhot-ns-projects.vercel.app/employees/${employee.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          employee_id: employee.employee_id,
+          name: data.name,
+          email: data.email,
+          department: data.department,
+          designation: data.designation,
+          start_date: data.start_date,
+          status: data.status ? "active" : "inactive",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update employee');
+      }
+
+      const result = await response.json();
+      console.log("Employee updated successfully:", result);
+      onOpenChange(false); // Close the dialog
+    } catch (error) {
+      console.error("Error updating employee:", error);
+      // Here you might want to show an error message to the user
     }
-    console.log("Update employee:", updatedEmployee)
-    onOpenChange(false) // Close the dialog
   }
 
   return (
@@ -75,7 +99,7 @@ export function EditEmployeeDialog({ employee, open, onOpenChange }: Props) {
 
           <div>
             <Label>Email</Label>
-            <Input {...form.register("email")} />
+            <Input {...form.register("email")} type="email" />
           </div>
 
           <div>
@@ -93,6 +117,7 @@ export function EditEmployeeDialog({ employee, open, onOpenChange }: Props) {
                 <SelectItem value="HR">HR</SelectItem>
                 <SelectItem value="Marketing">Marketing</SelectItem>
                 <SelectItem value="Engineering">Engineering</SelectItem>
+                <SelectItem value="Finance">Finance</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -100,6 +125,11 @@ export function EditEmployeeDialog({ employee, open, onOpenChange }: Props) {
           <div>
             <Label>Designation</Label>
             <Input {...form.register("designation")} />
+          </div>
+
+          <div>
+            <Label>Start Date</Label>
+            <Input {...form.register("start_date")} type="date" />
           </div>
 
           <div className="flex items-center gap-2">

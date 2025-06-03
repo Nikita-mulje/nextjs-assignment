@@ -12,6 +12,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import * as React from "react"
 
 export const columns: ColumnDef<Employee>[] = [
@@ -67,7 +75,28 @@ export const columns: ColumnDef<Employee>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const employee = row.original
-      const [open, setOpen] = React.useState(false)
+      const [editOpen, setEditOpen] = React.useState(false)
+      const [deleteOpen, setDeleteOpen] = React.useState(false)
+
+      const handleDelete = async () => {
+        try {
+          const response = await fetch(`https://employee-management-portal-git-master-sourabhkhot-ns-projects.vercel.app/employees/${employee.id}`, {
+            method: 'DELETE',
+          })
+
+          if (!response.ok) {
+            throw new Error('Failed to delete employee')
+          }
+
+          // Close the dialog
+          setDeleteOpen(false)
+          
+          // Refresh the page to show updated data
+          window.location.reload()
+        } catch (error) {
+          console.error('Error deleting employee:', error)
+        }
+      }
 
       return (
         <>
@@ -79,17 +108,45 @@ export const columns: ColumnDef<Employee>[] = [
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setOpen(true)}>
+              <DropdownMenuItem onClick={() => setEditOpen(true)}>
                 Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => setDeleteOpen(true)}
+                className="text-red-600"
+              >
+                Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
           <EditEmployeeDialog
-            open={open}
-            onOpenChange={setOpen}
+            open={editOpen}
+            onOpenChange={setEditOpen}
             employee={employee}
           />
+
+          <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Are you sure?</DialogTitle>
+                <DialogDescription>
+                  This action cannot be undone. This will permanently delete {employee.name}'s record.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setDeleteOpen(false)}>
+                  Cancel
+                </Button>
+                <Button 
+                  variant="destructive" 
+                  onClick={handleDelete}
+                >
+                  Delete
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </>
       )
     },
