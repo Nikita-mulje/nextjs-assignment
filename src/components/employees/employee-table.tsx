@@ -14,7 +14,7 @@ import {
   getSortedRowModel,
   flexRender,
 } from "@tanstack/react-table"
-
+import { useRouter, useSearchParams } from "next/navigation"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import {
@@ -45,15 +45,60 @@ import { CreateEmployeeDialog } from "./CreateEmployeeDialog"
 
 type Props = {
   data: Employee[]
-  onEmployeeCreated?: () => void
+  onEmployeeCreated?: (employee: Employee) => void
+  initialSearch?: string
+  initialDepartment?: string
 }
 
-export function EmployeeTable({ data, onEmployeeCreated }: Props) {
+export function EmployeeTable({ data: initialData, onEmployeeCreated, initialSearch = "", initialDepartment = "" }: Props) {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const [data, setData] = React.useState(initialData)
   const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([
+    { id: "name", value: initialSearch },
+    { id: "department", value: initialDepartment },
+  ])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
 
   const departments = Array.from(new Set(data.map((e) => e.department)))
+
+  // Update URL when filters change
+  const updateSearchParams = React.useCallback((name: string, department: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+    
+    if (name) {
+      params.set("name", name)
+    } else {
+      params.delete("name")
+    }
+
+    if (department) {
+      params.set("department", department)
+    } else {
+      params.delete("department")
+    }
+
+    router.push(`?${params.toString()}`)
+  }, [router, searchParams])
+
+  // Handle filter changes
+  const handleNameFilter = React.useCallback((value: string) => {
+    const departmentFilter = table.getColumn("department")?.getFilterValue() as string
+    updateSearchParams(value, departmentFilter || "")
+    table.getColumn("name")?.setFilterValue(value)
+  }, [updateSearchParams])
+
+  const handleDepartmentFilter = React.useCallback((value: string) => {
+    const nameFilter = table.getColumn("name")?.getFilterValue() as string
+    updateSearchParams(nameFilter || "", value === "*" ? "" : value)
+    table.getColumn("department")?.setFilterValue(value === "*" ? "" : value)
+  }, [updateSearchParams])
+
+  const handleEmployeeCreated = React.useCallback(async (newEmployee: Employee) => {
+    setData(prevData => [...prevData, newEmployee])
+    onEmployeeCreated?.(newEmployee)
+  }, [onEmployeeCreated])
 
   const table = useReactTable({
     data,
@@ -80,17 +125,15 @@ export function EmployeeTable({ data, onEmployeeCreated }: Props) {
           <Input
             placeholder="Search by employee name..."
             value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-            onChange={(e) => table.getColumn("name")?.setFilterValue(e.target.value)}
+            onChange={(e) => handleNameFilter(e.target.value)}
             className="max-w-sm"
           />
-          <CreateEmployeeDialog onEmployeeCreated={onEmployeeCreated} />
+          <CreateEmployeeDialog onEmployeeCreated={handleEmployeeCreated} />
         </div>
         <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-
           <Select
-            onValueChange={(value) =>
-              table.getColumn("department")?.setFilterValue(value === "*" ? "" : value)
-            }
+            value={(table.getColumn("department")?.getFilterValue() as string) || "*"}
+            onValueChange={handleDepartmentFilter}
           >
             <SelectTrigger className="w-[200px]">
               <SelectValue placeholder="Filter by department" />

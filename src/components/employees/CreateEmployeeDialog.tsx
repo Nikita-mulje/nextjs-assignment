@@ -4,6 +4,7 @@ import * as React from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { Employee } from "@/lib/data/employees"
 import {
   Dialog,
   DialogContent,
@@ -22,6 +23,7 @@ import {
   SelectContent,
 } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
+import { Loader2 } from "lucide-react"
 
 const formSchema = z.object({
   employee_id: z.string().min(1),
@@ -36,11 +38,12 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>
 
 type Props = {
-  onEmployeeCreated?: () => void
+  onEmployeeCreated?: (employee: Employee) => void
 }
 
 export function CreateEmployeeDialog({ onEmployeeCreated }: Props) {
   const [open, setOpen] = React.useState(false)
+  const [isSubmitting, setIsSubmitting] = React.useState(false)
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -55,6 +58,7 @@ export function CreateEmployeeDialog({ onEmployeeCreated }: Props) {
   })
 
   const onSubmit = async (data: FormData) => {
+    setIsSubmitting(true)
     try {
       const response = await fetch('https://employee-management-portal-git-master-sourabhkhot-ns-projects.vercel.app/employees', {
         method: 'POST',
@@ -68,11 +72,14 @@ export function CreateEmployeeDialog({ onEmployeeCreated }: Props) {
         throw new Error('Failed to create employee')
       }
 
-      onEmployeeCreated?.()
+      const newEmployee = await response.json()
+      onEmployeeCreated?.(newEmployee)
       form.reset()
-      setOpen(false) // Close the dialog after successful creation
+      setOpen(false)
     } catch (error) {
       console.error('Error creating employee:', error)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -146,7 +153,16 @@ export function CreateEmployeeDialog({ onEmployeeCreated }: Props) {
           </div>
 
           <DialogFooter>
-            <Button type="submit">Create Employee</Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                'Create Employee'
+              )}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
