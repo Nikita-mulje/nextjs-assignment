@@ -14,19 +14,26 @@ const data = [
 
 export default function LineChartCard() {
   return (
-    <Card>
+    <Card className="w-full">
       <CardHeader>
-        <CardTitle>Weekly Active Users</CardTitle>
+        <CardTitle className="text-lg sm:text-xl">Weekly Active Users</CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={250}>
-          <LineChart data={data}>
+        <ResponsiveContainer width="100%" height={250} minWidth={200}>
+          <LineChart data={data} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" />
-            <YAxis />
+            <YAxis width={40} />
             <Tooltip />
-            <Legend />
-            <Line type="monotone" dataKey="users" stroke="#10b981" />
+            <Legend layout="horizontal" verticalAlign="bottom" align="center" />
+            <Line 
+              type="monotone" 
+              dataKey="users" 
+              stroke="#10b981"
+              strokeWidth={2}
+              dot={{ strokeWidth: 2 }}
+              activeDot={{ r: 6, strokeWidth: 2 }}
+            />
           </LineChart>
         </ResponsiveContainer>
       </CardContent>

@@ -15,22 +15,22 @@ const COLORS = ['#6366f1', '#10b981', '#f97316']
 
 export default function PieChartCard() {
   return (
-    <Card>
+    <Card className="w-full">
       <CardHeader>
-        <CardTitle>Employees by Department</CardTitle>
+        <CardTitle className="text-lg sm:text-xl">Employees by Department</CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={250}>
+        <ResponsiveContainer width="100%" height={250} minWidth={200}>
           <PieChart>
             <Tooltip />
-            <Legend />
+            <Legend layout="horizontal" verticalAlign="bottom" align="center" />
             <Pie
               data={data}
               dataKey="value"
               nameKey="name"
               cx="50%"
-              cy="50%"
-              outerRadius={80}
+              cy="45%"
+              outerRadius={60}
               label
             >
               {data.map((entry, index) => (

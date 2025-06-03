@@ -14,18 +14,23 @@ const data = [
 
 export default function BarChartCard() {
   return (
-    <Card>
+    <Card className="w-full">
       <CardHeader>
-        <CardTitle>Monthly Revenue</CardTitle>
+        <CardTitle className="text-lg sm:text-xl">Monthly Revenue</CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={250}>
-          <BarChart data={data}>
+        <ResponsiveContainer width="100%" height={250} minWidth={200}>
+          <BarChart data={data} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" />
-            <YAxis />
+            <YAxis width={40} />
             <Tooltip />
-            <Bar dataKey="value" fill="#6366f1" />
+            <Bar 
+              dataKey="value" 
+              fill="#6366f1"
+              radius={[4, 4, 0, 0]}
+              maxBarSize={60}
+            />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>
