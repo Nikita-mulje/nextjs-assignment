@@ -22,6 +22,7 @@ import {
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Employee } from "@/lib/data/employees"
+import React from "react"
 
 const formSchema = z.object({
   name: z.string().min(2),
@@ -43,15 +44,40 @@ type Props = {
 export function EditEmployeeDialog({ employee, open, onOpenChange }: Props) {
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: employee.name,
-      email: employee.email,
-      department: employee.department,
-      designation: employee.designation,
-      status: employee.status === "active",
-      start_date: employee.start_date,
-    },
   })
+
+  React.useEffect(() => {
+    const fetchEmployee = async () => {
+      try {
+        const response = await fetch(`https://employee-management-portal-git-master-sourabhkhot-ns-projects.vercel.app/employees/${employee.id}`)
+        if (!response.ok) {
+          throw new Error('Failed to fetch employee')
+        }
+        const employeeData = await response.json()
+        
+        // Format the date to YYYY-MM-DD
+        const formattedDate = employeeData.start_date 
+          ? new Date(employeeData.start_date).toISOString().split('T')[0]
+          : ''
+        
+        // Set form values with fetched data
+        form.reset({
+          name: employeeData.name,
+          email: employeeData.email,
+          department: employeeData.department,
+          designation: employeeData.designation,
+          status: employeeData.status === "active",
+          start_date: formattedDate,
+        })
+      } catch (error) {
+        console.error("Error fetching employee:", error)
+      }
+    }
+
+    if (open) {
+      fetchEmployee()
+    }
+  }, [open, employee.id, form])
 
   async function onSubmit(data: FormData) {
     try {
