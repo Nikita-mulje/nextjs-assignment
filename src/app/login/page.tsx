@@ -13,26 +13,12 @@ export default function LoginPage() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
-  // const handleLogin = (e: React.FormEvent) => {
-  //   e.preventDefault()
-
-  //   // Fake credentials
-  //   const validUsername = 'admin'
-  //   const validPassword = 'password123'
-
-  //   if (username === validUsername && password === validPassword) {
-  //     localStorage.setItem('auth', 'true')
-  //     router.push('/dashboard')
-  //   } else {
-  //     setError('Invalid credentials')
-  //   }
-  // }
-
-  
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('') // clear any previous errors
+    setIsLoading(true)
   
     try {
       const response = await fetch('https://employee-management-portal-git-master-sourabhkhot-ns-projects.vercel.app/auth/signin', {
@@ -45,9 +31,8 @@ export default function LoginPage() {
       const data = await response.json()
   
       if (response.ok) {
-        // Save auth token or set auth flag as needed
         localStorage.setItem('auth', 'true')
-        localStorage.setItem('token', data.token) // optional if your API sends a token
+        localStorage.setItem('token', data.token)
         router.push('/dashboard')
       } else {
         setError(data.message || 'Login failed')
@@ -55,10 +40,11 @@ export default function LoginPage() {
     } catch (error) {
       setError('Something went wrong. Please try again.')
       console.error('Login error:', error)
+    } finally {
+      setIsLoading(false)
     }
   }
   
-
   useEffect(() => {
     const isAuth = localStorage.getItem('auth')
     if (isAuth === 'true') {
@@ -84,6 +70,7 @@ export default function LoginPage() {
                 placeholder="Enter your username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                disabled={isLoading}
               />
             </div>
 
@@ -95,15 +82,15 @@ export default function LoginPage() {
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                disabled={isLoading}
               />
             </div>
 
-            <Button type="submit" className="w-full mt-4">
+            <Button type="submit" className="w-full mt-4" disabled={isLoading} loading={isLoading}>
               Login
             </Button>
           </form>
 
-          {/* Link to Sign Up */}
           <p className="text-sm text-center text-muted-foreground mt-6">
             Don't have an account?{' '}
             <Link href="/sign-up" className="text-blue-600 hover:underline">
